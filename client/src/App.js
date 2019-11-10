@@ -1,19 +1,20 @@
 import React, { Component } from "react";
 import getWeb3 from "./utils/getWeb3";
-import OwnershipContract from "./contracts/Demo.json";
+import OwnershipContract from "./contracts/Auction.json";
 import "./App.css";
 import TextField from '@material-ui/core/TextField';
 
 class App extends Component {
 
-	state = { totBids: [], topBids: [], price: null }
+	state = { bidId: null, minAmt: null, bidName: null, totBids: [], topBids: [], price: null, winnerID: null }
 
 	constructor(props) {
 		super(props)
 
-		this.getNum = this.getNum.bind(this);
+		this.sendCreateAuc = this.sendCreateAuc.bind(this);
 		this.sendBidAmt = this.sendBidAmt.bind(this);
-		this.totBids = this.totBids.bind(this);		
+		this.sendFinalize = this.sendFinalize.bind(this);
+		this.sendResult = this.sendResult.bind(this);
 	}
 
 	componentDidMount = async () => {
@@ -32,11 +33,11 @@ class App extends Component {
 				OwnershipContract.abi,
 				deployedNetwork && deployedNetwork.address,
 			);
-			instance.address = "0x83ce02500ff42989feb847a2e2b2a5dc781f1b0e";
+			instance.address = "0xc6024152dfa7b37daf7d1581e271a7effad70e19";
 			// Set web3, accounts, and contract to the state, and then proceed with an
 			// example of interacting with the contract's methods.
 			this.setState({ web3, accounts, contract: instance });
-			console.log(window.web3.getTransactionReceipt)
+
 		} catch (error) {
 			// Catch any errors for any of the above operations.
 			alert(
@@ -46,38 +47,45 @@ class App extends Component {
 		}
 	};
 
-	getBids = async () => {
-		const { contract } = this.state;
-		const response = await contract.methods.getTopBid().call();
-		this.setState({ topBids : response });
-		console.log(response);
-	};
-	
-	sendBid = async () => {
-		const { contract, accounts, price } = this.state;
-		await contract.methods.submitBid(price).send({ from: accounts[0] });
+	createAuc = async () => {
+		const { contract, accounts, bidId, minAmt, bidName } = this.state;
+		await contract.methods.createAuc(bidId, minAmt, bidName).send({ from: accounts[0] });
 	};
 
-	getTotBids = async () => {
-		const { contract } = this.state;
-		const response = await contract.methods.getNumberOfBids().call();
-		this.setState({ totBids : response._hex });
-		console.log(response);
+	submitBid = async () => {
+		const { contract, accounts, price, bidId } = this.state;
+		await contract.methods.submitBid(bidId).send({ from: accounts[0], value: price * 1000000000000000000});
 	};
 
-	getNum(event) {
-		event.preventDefault();
-		this.setState(this.getBids);
+	finalize = async () => {
+		const { contract, accounts, bidId } = this.state;
+		await contract.methods.finalize(bidId).send({ from: accounts[0]});
+	}
+
+	getResult = async () => {
+		const { contract, bidId } = this.state;
+		const response =  await contract.methods.getMaxBid(bidId).call();
+		this.setState({price: response[0]._hex, winnerID: response[1]})
 	}
 
 	sendBidAmt(event) {
 		event.preventDefault();
-		this.setState(this.sendBid);
+		this.setState(this.submitBid);
 	}
 
-	totBids(event) {
+	sendFinalize(event) {
 		event.preventDefault();
-		this.setState(this.getTotBids)
+		this.setState(this.finalize)
+	}
+	
+	sendCreateAuc(event) {
+		event.preventDefault();
+		this.setState(this.createAuc)
+	}
+	
+	sendResult(event) {
+		event.preventDefault();
+		this.setState(this.getResult)
 	}
 
 	render() {
@@ -91,29 +99,45 @@ class App extends Component {
 		return (
 			<div className="App">
 				<h1> Auction on Ethereum Network </h1>
+				<p><strong>My Address: </strong>{this.state.accounts[0]}</p>
+
 				<div>
-					<form onSubmit={this.sendBidAmt}>
-						<br></br>
-						<TextField type='text' placeholder='Submit your price!' onInput={e => this.setState({ price: e.target.value })} />
-						<button className="button"> Submit your Bid </button>
-					</form>
-				</div>
-			
-				<div>
-					<form class='form' onSubmit={this.getNum}>
-						<h2>Get Bid Result</h2>
-						<button className="button">Get Top Bid </button>
-						<p>Top Bidder : {this.state.topBids[0]}</p>
-						<p>Top Bid : {parseInt(this.state.topBids[1])}</p>
+					<form class='form' onSubmit={this.sendCreateAuc}>
+						<h2>Create Acution</h2>
+						<TextField type='text' label='Bid Id' onInput={e => this.setState({ bidId: e.target.value })} />
+						<TextField type='text' label='Bid Name' onInput={e => this.setState({ bidName: e.target.value })} />
+						<TextField type='text' label='Min Amount' onInput={e => this.setState({ minAmt: e.target.value })} />
+						<button className="button"> Create Bid </button>
 					</form>
 				</div>
 				
 				<div>
-					<form onSubmit={this.totBids}>
-						<button className="button">Get Total Number of Bids</button>
-						<p>Total Bids : {parseInt(this.state.totBids) - 1}</p>
+					<form class='form' onSubmit={this.sendBidAmt}>
+						<h2>Submit Bid</h2>
+						<TextField type='text' label='Bid Id' onInput={e => this.setState({ bidId: e.target.value })} />
+						<TextField type='text' label='Your Bid' onInput={e => this.setState({ price: e.target.value })} />
+						<button className="button"> Submit your Bid </button>
 					</form>
 				</div>
+				
+				<div>
+					<form class='form' onSubmit={this.sendFinalize}>
+						<h2>Finalize Bid</h2>
+						<TextField type='text' label='Bid Id' onInput={e => this.setState({ bidId: e.target.value })} />
+						<button className="button"> Finalize Bid </button>
+					</form>
+				</div>
+
+				<div>
+					<form class='form' onSubmit={this.sendResult}>
+						<h2>Get Bid Result</h2>
+						<TextField type='text' label='Bid Id' onInput={e => this.setState({ bidId: e.target.value })} />
+						<button className="button"> Get Bid Result </button>
+						<p>Bid Amount : {this.state.price}</p>
+						<p>Winner : {this.state.winnerID}</p>
+					</form>
+				</div>
+				
 			</div>
 		);
 	}
