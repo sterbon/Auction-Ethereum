@@ -35,7 +35,7 @@ class App extends Component {
 				OwnershipContract.abi,
 				deployedNetwork && deployedNetwork.address,
 			);
-			instance.address = "0xd5a02f6c8b367e3af4c3783c35c97c54bda152da";
+			instance.address = "0xd665392f30260f2a717ee1aa760270bfd5d68d5e";
 			// Set web3, accounts, and contract to the state, and then proceed with an
 			// example of interacting with the contract's methods.
 			this.setState({ web3, accounts, contract: instance });
