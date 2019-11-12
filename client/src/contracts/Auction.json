@@ -5,17 +5,14 @@
       "constant": false,
       "inputs": [
         {
-          "internalType": "uint256",
           "name": "bidId",
           "type": "uint256"
         },
         {
-          "internalType": "uint256",
           "name": "minBidAmount",
           "type": "uint256"
         },
         {
-          "internalType": "string",
           "name": "bidCreaterName",
           "type": "string"
         }
@@ -30,7 +27,6 @@
       "constant": false,
       "inputs": [
         {
-          "internalType": "uint256",
           "name": "bidId",
           "type": "uint256"
         }
@@ -45,7 +41,6 @@
       "constant": false,
       "inputs": [
         {
-          "internalType": "uint256",
           "name": "bidId",
           "type": "uint256"
         }
@@ -57,35 +52,32 @@
       "type": "function"
     },
     {
-      "constant": true,
+      "constant": false,
       "inputs": [
         {
-          "internalType": "uint256",
-          "name": "bidId",
+          "name": "_i",
           "type": "uint256"
         }
       ],
+      "name": "uint2str",
+      "outputs": [
+        {
+          "name": "_uintAsString",
+          "type": "string"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
       "name": "getAllAuc",
       "outputs": [
         {
-          "internalType": "bool",
           "name": "",
-          "type": "bool"
-        },
-        {
-          "internalType": "address",
-          "name": "",
-          "type": "address"
-        },
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        },
-        {
-          "internalType": "string",
-          "name": "",
-          "type": "string"
+          "type": "string[][]"
         }
       ],
       "payable": false,
@@ -96,7 +88,6 @@
       "constant": true,
       "inputs": [
         {
-          "internalType": "uint256",
           "name": "bidId",
           "type": "uint256"
         }
@@ -104,7 +95,6 @@
       "name": "getAllBidders",
       "outputs": [
         {
-          "internalType": "address payable[]",
           "name": "",
           "type": "address[]"
         }
@@ -117,7 +107,6 @@
       "constant": true,
       "inputs": [
         {
-          "internalType": "uint256",
           "name": "bidId",
           "type": "uint256"
         }
@@ -125,7 +114,6 @@
       "name": "getAllBidPrice",
       "outputs": [
         {
-          "internalType": "uint256[]",
           "name": "",
           "type": "uint256[]"
         }
@@ -138,7 +126,6 @@
       "constant": true,
       "inputs": [
         {
-          "internalType": "uint256",
           "name": "bidId",
           "type": "uint256"
         }
@@ -146,12 +133,10 @@
       "name": "getMaxBid",
       "outputs": [
         {
-          "internalType": "uint256",
           "name": "largest",
           "type": "uint256"
         },
         {
-          "internalType": "address",
           "name": "winner",
           "type": "address"
         }

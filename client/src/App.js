@@ -6,7 +6,7 @@ import TextField from '@material-ui/core/TextField';
 
 class App extends Component {
 
-	state = { bidId: null, minAmt: null, bidName: null, totBids: [], topBids: [], price: null, winnerID: null }
+	state = { allBids: [], bidId: null, minAmt: null, bidName: null, totBids: [], topBids: [], price: null, winnerID: null }
 
 	constructor(props) {
 		super(props)
@@ -15,6 +15,8 @@ class App extends Component {
 		this.sendBidAmt = this.sendBidAmt.bind(this);
 		this.sendFinalize = this.sendFinalize.bind(this);
 		this.sendResult = this.sendResult.bind(this);
+		this.sendGetAllAuc = this.sendGetAllAuc.bind(this);
+		
 	}
 
 	componentDidMount = async () => {
@@ -33,7 +35,7 @@ class App extends Component {
 				OwnershipContract.abi,
 				deployedNetwork && deployedNetwork.address,
 			);
-			instance.address = "0xc6024152dfa7b37daf7d1581e271a7effad70e19";
+			instance.address = "0xd5a02f6c8b367e3af4c3783c35c97c54bda152da";
 			// Set web3, accounts, and contract to the state, and then proceed with an
 			// example of interacting with the contract's methods.
 			this.setState({ web3, accounts, contract: instance });
@@ -68,6 +70,13 @@ class App extends Component {
 		this.setState({price: response[0]._hex, winnerID: response[1]})
 	}
 
+	getAllAuc = async () => {
+		const { contract, allBids } = this.state;
+		const response =  await contract.methods.getAllAuc().call();
+		this.setState({allBids : response})
+		console.log(allBids);
+	}
+
 	sendBidAmt(event) {
 		event.preventDefault();
 		this.setState(this.submitBid);
@@ -88,6 +97,11 @@ class App extends Component {
 		this.setState(this.getResult)
 	}
 
+	sendGetAllAuc(event) {
+		event.preventDefault();
+		this.setState(this.getAllAuc);
+	}
+
 	render() {
 		if (!this.state.web3) {
 			return (
@@ -95,11 +109,23 @@ class App extends Component {
 					<div text-align="center">Install and login to <a href="http://www.metamask.io" target="_blank">MetaMask</a> to interact with the app! </div>
 				</div>);
 		}
+
+		const allAuc = Object.values(this.state.allBids).map((key) => (
+		<p> <strong>Bid Name:</strong> {key[3]} <strong>Bid ID:</strong> {key[0]}  <strong>Min Bid Amount:</strong> {key[2]} </p>
+		));
 		
 		return (
 			<div className="App">
 				<h1> Auction on Ethereum Network </h1>
 				<p><strong>My Address: </strong>{this.state.accounts[0]}</p>
+
+				<div>
+					<form class='form' onSubmit={this.sendGetAllAuc}>
+						<h2>Get All Bids</h2>
+						<button className="button"> Get All Bids </button>
+						{allAuc}
+					</form>
+				</div>
 
 				<div>
 					<form class='form' onSubmit={this.sendCreateAuc}>
@@ -137,6 +163,7 @@ class App extends Component {
 						<p>Winner : {this.state.winnerID}</p>
 					</form>
 				</div>
+				
 				
 			</div>
 		);
