@@ -6,7 +6,6 @@ contract BiddingContract
     struct Bid {
         uint bidId;
         uint timestamp;
-        uint endTime;
         address payable bidCreater;
         string bidCreaterName;
         uint minBidAmount;
@@ -15,6 +14,8 @@ contract BiddingContract
         bool done;
     }
     
+    string[][] bids;
+    
     mapping(uint => Bid) Bids;
 
     function createAuc(uint bidId, uint minBidAmount ,string memory bidCreaterName) public {
@@ -22,8 +23,9 @@ contract BiddingContract
         Bids[bidId].bidCreaterName = bidCreaterName;
         Bids[bidId].minBidAmount = minBidAmount;
         Bids[bidId].timestamp = block.timestamp;
-        Bids[bidId].endTime = block.timestamp + 5 seconds;
         Bids[bidId].done = false;
+        
+        bids.push([uint2str(bidId), uint2str(block.timestamp), uint2str(minBidAmount), bidCreaterName]);
     }
     
     function submitBid(uint bidId) payable public {
@@ -36,8 +38,8 @@ contract BiddingContract
         Bids[bidId].bids.push(msg.value);
     }
 
-    function getAllAuc(uint bidId) public view returns (bool, address, uint, string memory) {
-        return (Bids[bidId].done, Bids[bidId].bidCreater, Bids[bidId].minBidAmount, Bids[bidId].bidCreaterName);
+    function getAllAuc() public view returns (string[][] memory) {
+        return bids;
     }
     
     function getAllBidPrice(uint bidId) public view returns (uint[] memory) {
@@ -47,9 +49,6 @@ contract BiddingContract
     function getAllBidders(uint bidId) public view returns (address payable [] memory) {
         return (Bids[bidId].bidders);
     }
-    
-    //finalize function
-    //send token with msg.value 
     
     function finalize(uint bidId) public {
         require(msg.sender == Bids[bidId].bidCreater);
@@ -70,5 +69,24 @@ contract BiddingContract
         }
         
         return (largest, winner);
+    }
+    
+    function uint2str(uint _i) public returns (string memory _uintAsString) {
+        if (_i == 0) {
+            return "0";
+        }
+        uint j = _i;
+        uint len;
+        while (j != 0) {
+            len++;
+            j /= 10;
+        }
+        bytes memory bstr = new bytes(len);
+        uint k = len - 1;
+        while (_i != 0) {
+            bstr[k--] = byte(uint8(48 + _i % 10));
+            _i /= 10;
+        }
+        return string(bstr);
     }
 }
