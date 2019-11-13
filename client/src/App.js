@@ -3,6 +3,9 @@ import getWeb3 from "./utils/getWeb3";
 import OwnershipContract from "./contracts/Auction.json";
 import "./App.css";
 import TextField from '@material-ui/core/TextField';
+import "react-tabs/style/react-tabs.css";
+import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
+import { AppBar } from "@material-ui/core";
 
 class App extends Component {
 
@@ -35,7 +38,7 @@ class App extends Component {
 				OwnershipContract.abi,
 				deployedNetwork && deployedNetwork.address,
 			);
-			instance.address = "0xd5a02f6c8b367e3af4c3783c35c97c54bda152da";
+			instance.address = "0xd665392f30260f2a717ee1aa760270bfd5d68d5e";
 			// Set web3, accounts, and contract to the state, and then proceed with an
 			// example of interacting with the contract's methods.
 			this.setState({ web3, accounts, contract: instance });
@@ -116,18 +119,41 @@ class App extends Component {
 		
 		return (
 			<div className="App">
-				<h1> Auction on Ethereum Network </h1>
-				<p><strong>My Address: </strong>{this.state.accounts[0]}</p>
+				<AppBar  position='relative' color="primary">
+					<h1> Auction on Ethereum Network </h1>
+					<p><strong>My Address: </strong>{this.state.accounts[0]}</p>
+				</AppBar>
+				<Tabs>
+				<AppBar class='appBar' position='fixed'>
+				<TabList>
+					<Tab>All Bids</Tab>
+					<Tab>Create Auction</Tab>
+					<Tab>Submit Bid</Tab>
+					<Tab>Finalize Bid</Tab>
+					<Tab>Get Bid Result</Tab>
+    			</TabList>
+				</AppBar>
 
-				<div>
-					<form class='form' onSubmit={this.sendGetAllAuc}>
-						<h2>Get All Bids</h2>
-						<button className="button"> Get All Bids </button>
-						{allAuc}
-					</form>
-				</div>
+				<TabPanel>
+						<div>
+							<br></br>
+							<br></br>
+							<br></br>
+							<br></br>
+							<form class='form' onSubmit={this.sendGetAllAuc}>
+								<h2>Get All Bids</h2>
+								<button className="button"> Get All Bids </button>
+								{allAuc}
+							</form>
+						</div>
+				</TabPanel>
 
+				<TabPanel>
 				<div>
+							<br></br>
+							<br></br>
+							<br></br>
+							<br></br>
 					<form class='form' onSubmit={this.sendCreateAuc}>
 						<h2>Create Acution</h2>
 						<TextField type='text' label='Bid Id' onInput={e => this.setState({ bidId: e.target.value })} />
@@ -136,8 +162,14 @@ class App extends Component {
 						<button className="button"> Create Bid </button>
 					</form>
 				</div>
-				
+				</TabPanel>
+
+				<TabPanel>
 				<div>
+							<br></br>
+							<br></br>
+							<br></br>
+							<br></br>
 					<form class='form' onSubmit={this.sendBidAmt}>
 						<h2>Submit Bid</h2>
 						<TextField type='text' label='Bid Id' onInput={e => this.setState({ bidId: e.target.value })} />
@@ -145,16 +177,28 @@ class App extends Component {
 						<button className="button"> Submit your Bid </button>
 					</form>
 				</div>
-				
+				</TabPanel>
+
+				<TabPanel>
 				<div>
+							<br></br>
+							<br></br>
+							<br></br>
+							<br></br>
 					<form class='form' onSubmit={this.sendFinalize}>
 						<h2>Finalize Bid</h2>
 						<TextField type='text' label='Bid Id' onInput={e => this.setState({ bidId: e.target.value })} />
 						<button className="button"> Finalize Bid </button>
 					</form>
 				</div>
+				</TabPanel>
 
+				<TabPanel>
 				<div>
+							<br></br>
+							<br></br>
+							<br></br>
+							<br></br>
 					<form class='form' onSubmit={this.sendResult}>
 						<h2>Get Bid Result</h2>
 						<TextField type='text' label='Bid Id' onInput={e => this.setState({ bidId: e.target.value })} />
@@ -163,8 +207,9 @@ class App extends Component {
 						<p>Winner : {this.state.winnerID}</p>
 					</form>
 				</div>
-				
-				
+				</TabPanel>
+				</Tabs>
+
 			</div>
 		);
 	}
